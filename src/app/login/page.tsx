@@ -23,27 +23,11 @@ export default function LoginPage() {
     if (!email.trim()) return;
     setLoading(true);
     try {
-      const knownRaw = localStorage.getItem('brsa_known_evaluators');
-      const known: Record<string, string> = knownRaw ? JSON.parse(knownRaw) : {};
-      const evaluatorId = known[email.toLowerCase()];
-      if (!evaluatorId) {
-        setToast({ msg: 'No account found for that email. Please register first.', type: 'error' });
-        setLoading(false);
-        return;
-      }
-      await api.getProgress(evaluatorId);
-      login({
-        evaluator_id: evaluatorId,
-        full_name: known[email.toLowerCase() + '_name'] || email,
-        email: email.toLowerCase(),
-        status: 'active',
-        certified: false,
-        certified_at: null,
-        created_at: '',
-      });
+      const evaluatorData = await api.lookupByEmail(email.trim().toLowerCase());
+      login(evaluatorData);
       router.push('/dashboard');
-    } catch (err: unknown) {
-      setToast({ msg: err instanceof Error ? err.message : 'Login failed', type: 'error' });
+    } catch {
+      setToast({ msg: 'No account found for that email. Please register first.', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -99,4 +83,4 @@ export default function LoginPage() {
       </div>
     </>
   );
-      }
+}
