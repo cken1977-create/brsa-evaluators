@@ -63,6 +63,9 @@ export const api = {
   createEvaluator: (data: { full_name: string; email: string }) =>
     apiFetch<Evaluator>('/evaluators', { method: 'POST', body: JSON.stringify(data) }),
 
+  lookupByEmail: (email: string) =>
+    apiFetch<Evaluator>(`/evaluators/lookup?email=${encodeURIComponent(email)}`),
+  
   getProgress: (evaluatorId: string) =>
     apiFetch<EvaluatorProgress>(`/evaluators/${evaluatorId}/progress`),
 
