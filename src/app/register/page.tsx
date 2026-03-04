@@ -35,7 +35,8 @@ export default function RegisterPage() {
       const stored = localStorage.getItem('brsa_known_evaluators');
       const known: Record<string, string> = stored ? JSON.parse(stored) : {};
       known[form.email.trim().toLowerCase()] = newEvaluator.evaluator_id;
-      localStorage.setItem('brsa_known_evaluators', JSON.stringify(known));
+known[form.email.trim().toLowerCase() + '_name'] = form.name.trim();
+localStorage.setItem('brsa_known_evaluators', JSON.stringify(known));
       login(newEvaluator);
       setToast({ msg: 'Account created! Welcome to the BRSA Training Portal.', type: 'success' });
       setTimeout(() => router.push('/dashboard'), 1200);
