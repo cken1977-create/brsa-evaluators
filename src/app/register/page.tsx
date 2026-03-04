@@ -28,7 +28,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const newEvaluator = await api.createEvaluator({
-        name: form.name.trim(),
+        full_name: form.name.trim(),
         email: form.email.trim().toLowerCase(),
         organization: form.organization.trim() || undefined,
       });
