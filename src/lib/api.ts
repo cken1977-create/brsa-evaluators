@@ -13,38 +13,36 @@ export interface ModuleProgress {
   module_id: string;
   title: string;
   seq: number;
-  status: 'locked' | 'available' | 'in_progress' | 'passed' | 'failed';
+  status: 'locked' | 'unlocked' | 'passed' | 'failed';
+  score: number | null;
   attempts: number;
-  best_score: number | null;
-  passing_score: number;
   unlocked_at: string | null;
-  passed_at: string | null;
+  completed_at: string | null;
 }
 
 export interface Evaluator {
   evaluator_id: string;
   full_name: string;
   email: string;
-  organization?: string;
+  status: string;
   certified: boolean;
   certified_at: string | null;
   created_at: string;
 }
 
 export interface EvaluatorProgress {
-  evaluator: Evaluator;
-  modules: ModuleProgress[];
-  overall_progress: number;
-  certified: boolean;
+  evaluator_id: string;
+  total: number;
+  progress: ModuleProgress[];
 }
 
 export interface AttemptResult {
+  evaluator_id: string;
   module_id: string;
   score: number;
+  passing: number;
   passed: boolean;
-  next_module_unlocked: string | null;
-  certified: boolean;
-  message: string;
+  status: string;
 }
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
@@ -54,7 +52,7 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ message: 'Request failed' }));
-    throw new Error(err.message || `HTTP ${res.status}`);
+    throw new Error(err.error || err.message || `HTTP ${res.status}`);
   }
   return res.json();
 }
@@ -62,7 +60,7 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 export const api = {
   getModules: () => apiFetch<TrainingModule[]>('/training/modules'),
 
-  createEvaluator: (data: { full_name: string; email: string; organization?: string }) =>
+  createEvaluator: (data: { full_name: string; email: string }) =>
     apiFetch<Evaluator>('/evaluators', { method: 'POST', body: JSON.stringify(data) }),
 
   getProgress: (evaluatorId: string) =>
