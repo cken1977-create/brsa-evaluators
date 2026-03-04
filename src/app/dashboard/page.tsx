@@ -27,7 +27,7 @@ function CertBanner({ evaluator }: { evaluator: EvaluatorProgress['evaluator'] }
         <Award size={40} color="var(--success-light)" style={{ margin: '0 auto 12px' }} />
         <h2 style={{ color: 'var(--white)', marginBottom: 8 }}>Certification Achieved</h2>
         <p style={{ color: 'var(--success-light)', fontSize: '0.9rem', fontWeight: 500 }}>
-          {evaluator.name} · BRSA Certified Evaluator
+          {evaluator.full_name} · BRSA Certified Evaluator
         </p>
         {evaluator.certified_at && (
           <p style={{ color: 'var(--slate)', fontSize: '0.8rem', marginTop: 8 }}>
