@@ -23,26 +23,24 @@ export default function LoginPage() {
     if (!email.trim()) return;
     setLoading(true);
     try {
-      const stored = localStorage.getItem('brsa_known_evaluators');
-      const known: Record<string, string> = stored ? JSON.parse(stored) : {};
+      const knownRaw = localStorage.getItem('brsa_known_evaluators');
+      const known: Record<string, string> = knownRaw ? JSON.parse(knownRaw) : {};
       const evaluatorId = known[email.toLowerCase()];
       if (!evaluatorId) {
         setToast({ msg: 'No account found for that email. Please register first.', type: 'error' });
         setLoading(false);
         return;
       }
-      const progress = await api.getProgress(evaluatorId);
-// Build evaluator object from stored data + progress response
-const stored = JSON.parse(localStorage.getItem('brsa_known_evaluators') || '{}');
-login({
-  evaluator_id: evaluatorId,
-  full_name: '',
-  email: email.toLowerCase(),
-  status: 'active',
-  certified: false,
-  certified_at: null,
-  created_at: '',
-});
+      await api.getProgress(evaluatorId);
+      login({
+        evaluator_id: evaluatorId,
+        full_name: known[email.toLowerCase() + '_name'] || email,
+        email: email.toLowerCase(),
+        status: 'active',
+        certified: false,
+        certified_at: null,
+        created_at: '',
+      });
       router.push('/dashboard');
     } catch (err: unknown) {
       setToast({ msg: err instanceof Error ? err.message : 'Login failed', type: 'error' });
@@ -101,4 +99,4 @@ login({
       </div>
     </>
   );
-}
+      }
