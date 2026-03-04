@@ -28,10 +28,9 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const newEvaluator = await api.createEvaluator({
-        full_name: form.name.trim(),
-        email: form.email.trim().toLowerCase(),
-        organization: form.organization.trim() || undefined,
-      });
+  full_name: form.name.trim(),
+  email: form.email.trim().toLowerCase(),
+});
       const stored = localStorage.getItem('brsa_known_evaluators');
       const known: Record<string, string> = stored ? JSON.parse(stored) : {};
       known[form.email.trim().toLowerCase()] = newEvaluator.evaluator_id;
