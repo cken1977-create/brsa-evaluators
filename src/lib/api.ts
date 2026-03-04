@@ -23,7 +23,7 @@ export interface ModuleProgress {
 
 export interface Evaluator {
   evaluator_id: string;
-  name: string;
+  full_name: string;
   email: string;
   organization?: string;
   certified: boolean;
