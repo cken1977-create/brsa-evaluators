@@ -27,7 +27,7 @@ export default function Nav() {
               <span>Certified</span>
             </div>
           )}
-          <span style={{ color: 'var(--slate)', fontSize: '0.875rem' }}>{evaluator.name}</span>
+          <span style={{ color: 'var(--slate)', fontSize: '0.875rem' }}>{evaluator.full_name}</span>
           <button className="btn btn-ghost btn-sm" onClick={handleLogout}>
             <LogOut size={14} /> Sign out
           </button>
