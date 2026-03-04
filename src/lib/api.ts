@@ -62,7 +62,7 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 export const api = {
   getModules: () => apiFetch<TrainingModule[]>('/training/modules'),
 
-  createEvaluator: (data: { name: string; email: string; organization?: string }) =>
+  createEvaluator: (data: { full_name: string; email: string; organization?: string }) =>
     apiFetch<Evaluator>('/evaluators', { method: 'POST', body: JSON.stringify(data) }),
 
   getProgress: (evaluatorId: string) =>
