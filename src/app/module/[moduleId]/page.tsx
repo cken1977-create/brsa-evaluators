@@ -97,7 +97,9 @@ function ResultBanner({ result, passingScore }: { result: AttemptResult; passing
         <div className="score-ring passed">{result.score}%</div>
         <div>
           <div style={{ color: 'var(--success-light)', fontWeight: 600, fontSize: '1.05rem', marginBottom: 4 }}>✓ Module Passed</div>
-          <div style={{ color: 'var(--slate)', fontSize: '0.875rem' }}>{result.message}</div>
+          <div style={{ color: 'var(--slate)', fontSize: '0.875rem' }}>
+  {result.passed ? `Score: ${result.score}% — module complete.` : `Score: ${result.score}% — need ${result.passing}% to pass.`}
+</div>
           {result.certified && <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--gold)', marginTop: 8, fontWeight: 600 }}><Award size={16} /> BRSA Certification Awarded!</div>}
         </div>
       </div>
