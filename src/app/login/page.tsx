@@ -32,7 +32,17 @@ export default function LoginPage() {
         return;
       }
       const progress = await api.getProgress(evaluatorId);
-      login(progress.evaluator);
+// Build evaluator object from stored data + progress response
+const stored = JSON.parse(localStorage.getItem('brsa_known_evaluators') || '{}');
+login({
+  evaluator_id: evaluatorId,
+  full_name: '',
+  email: email.toLowerCase(),
+  status: 'active',
+  certified: false,
+  certified_at: null,
+  created_at: '',
+});
       router.push('/dashboard');
     } catch (err: unknown) {
       setToast({ msg: err instanceof Error ? err.message : 'Login failed', type: 'error' });
