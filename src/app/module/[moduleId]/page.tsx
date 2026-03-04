@@ -12,47 +12,51 @@ const QUIZ_TEMPLATES = [
   {
     questions: [
       { q: 'What is the primary purpose of BRSA evaluation standards?', options: ['To rank evaluators by performance', 'To establish consistent behavioral readiness criteria', 'To reduce evaluation time', 'To certify organizations only'], correct: 1 },
-      { q: 'Which of the following best describes "behavioral readiness"?', options: ['Physical fitness of participants', 'Cognitive and procedural preparedness for defined roles', 'Documentation compliance only', 'Training hours completed'], correct: 1 },
-      { q: 'An evaluator\'s primary responsibility when assessing participants is to:', options: ['Pass as many participants as possible', 'Apply objective, standardized criteria without bias', 'Defer all decisions to supervisors', 'Focus exclusively on written assessments'], correct: 1 },
+      { q: 'Which best describes "behavioral readiness"?', options: ['Physical fitness', 'Cognitive and procedural preparedness for defined roles', 'Documentation compliance only', 'Training hours completed'], correct: 1 },
+      { q: 'An evaluator\'s primary responsibility is to:', options: ['Pass as many participants as possible', 'Apply objective standardized criteria without bias', 'Defer all decisions to supervisors', 'Focus exclusively on written assessments'], correct: 1 },
     ],
   },
   {
     questions: [
-      { q: 'Evaluator impartiality requires that assessments be conducted:', options: ['Based on personal relationships', 'Without prior knowledge of the participant', 'Using consistent criteria regardless of evaluator-participant relationship', 'Only with senior oversight present'], correct: 2 },
+      { q: 'Evaluator impartiality requires assessments be conducted:', options: ['Based on personal relationships', 'Without prior knowledge of the participant', 'Using consistent criteria regardless of relationship', 'Only with senior oversight present'], correct: 2 },
       { q: 'Which practice BEST supports evaluator impartiality?', options: ['Sharing preliminary scores with colleagues', 'Documenting all observations contemporaneously', 'Adjusting criteria based on context', 'Conducting assessments in pairs only'], correct: 1 },
       { q: 'When an evaluator has a conflict of interest, they should:', options: ['Proceed but document the conflict', 'Recuse themselves and notify their coordinator', 'Have a colleague observe', 'Score more strictly to compensate'], correct: 1 },
     ],
   },
 ];
 
-function getQuizForModule(seq: number) {
+function getQuiz(seq: number) {
   return QUIZ_TEMPLATES[(seq - 1) % QUIZ_TEMPLATES.length];
 }
 
-interface QuizState {
-  answers: (number | null)[];
-  submitted: boolean;
-  score: number | null;
-}
-
-function QuizSection({ module, onSubmit, submitting, result }: { module: TrainingModule; onSubmit: (score: number) => void; submitting: boolean; result: AttemptResult | null; disabled: boolean; }) {
-  const quiz = getQuizForModule(module.seq);
-  const [state, setState] = useState<QuizState>({ answers: Array(quiz.questions.length).fill(null), submitted: false, score: null });
-  const allAnswered = state.answers.every(a => a !== null);
+function QuizSection({ module, onSubmit, submitting, result }: {
+  module: TrainingModule;
+  onSubmit: (score: number) => void;
+  submitting: boolean;
+  result: AttemptResult | null;
+}) {
+  const quiz = getQuiz(module.seq);
+  const [answers, setAnswers] = useState<(number | null)[]>(Array(quiz.questions.length).fill(null));
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSelect = (qi: number, oi: number) => {
-    if (state.submitted) return;
-    setState(s => { const answers = [...s.answers]; answers[qi] = oi; return { ...s, answers }; });
+    if (submitted) return;
+    setAnswers(a => { const n = [...a]; n[qi] = oi; return n; });
   };
 
   const handleSubmit = () => {
-    const correct = state.answers.filter((a, i) => a === quiz.questions[i].correct).length;
+    const correct = answers.filter((a, i) => a === quiz.questions[i].correct).length;
     const score = Math.round((correct / quiz.questions.length) * 100);
-    setState(s => ({ ...s, submitted: true, score }));
+    setSubmitted(true);
     onSubmit(score);
   };
 
-  const handleReset = () => setState({ answers: Array(quiz.questions.length).fill(null), submitted: false, score: null });
+  const handleReset = () => {
+    setAnswers(Array(quiz.questions.length).fill(null));
+    setSubmitted(false);
+  };
+
+  const allAnswered = answers.every(a => a !== null);
 
   return (
     <div>
@@ -66,41 +70,51 @@ function QuizSection({ module, onSubmit, submitting, result }: { module: Trainin
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {q.options.map((opt, oi) => {
               let cls = 'quiz-option';
-              if (state.answers[qi] === oi) cls += ' selected';
-              if (state.submitted) {
+              if (answers[qi] === oi) cls += ' selected';
+              if (submitted) {
                 if (oi === q.correct) cls = 'quiz-option correct';
-                else if (state.answers[qi] === oi && oi !== q.correct) cls = 'quiz-option incorrect';
+                else if (answers[qi] === oi) cls = 'quiz-option incorrect';
               }
-              return <div key={oi} className={cls} onClick={() => handleSelect(qi, oi)}><span style={{ color: 'var(--slate-dim)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', marginRight: 10 }}>{String.fromCharCode(65 + oi)}</span>{opt}</div>;
+              return (
+                <div key={oi} className={cls} onClick={() => handleSelect(qi, oi)}>
+                  <span style={{ color: 'var(--slate-dim)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', marginRight: 10 }}>{String.fromCharCode(65 + oi)}</span>
+                  {opt}
+                </div>
+              );
             })}
           </div>
         </div>
       ))}
-      {!state.submitted ? (
+      {!submitted ? (
         <button className="btn btn-primary" onClick={handleSubmit} disabled={!allAnswered || submitting} style={{ marginTop: 8 }}>
           {submitting ? <><div className="spinner" />Submitting…</> : 'Submit Quiz'}
         </button>
       ) : (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 8, flexWrap: 'wrap' }}>
-          {result && !result.passed && <button className="btn btn-ghost" onClick={handleReset}><RefreshCw size={14} /> Try Again</button>}
-          {result?.passed && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--success-light)', fontWeight: 500 }}><CheckCircle size={18} /> Module passed!</div>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 8 }}>
+          {result && !result.passed && (
+            <button className="btn btn-ghost" onClick={handleReset}>
+              <RefreshCw size={14} /> Try Again
+            </button>
+          )}
+          {result?.passed && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--success-light)', fontWeight: 500 }}>
+              <CheckCircle size={18} /> Module passed!
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-function ResultBanner({ result, passingScore }: { result: AttemptResult; passingScore: number }) {
+function ResultBanner({ result }: { result: AttemptResult }) {
   if (result.passed) {
     return (
       <div style={{ background: 'rgba(39,174,96,.1)', border: '1px solid rgba(39,174,96,.35)', borderRadius: 'var(--radius-lg)', padding: '24px', display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
         <div className="score-ring passed">{result.score}%</div>
         <div>
           <div style={{ color: 'var(--success-light)', fontWeight: 600, fontSize: '1.05rem', marginBottom: 4 }}>✓ Module Passed</div>
-          <div style={{ color: 'var(--slate)', fontSize: '0.875rem' }}>
-  {result.passed ? `Score: ${result.score}% — module complete.` : `Score: ${result.score}% — need ${result.passing}% to pass.`}
-</div>
-          {result.certified && <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--gold)', marginTop: 8, fontWeight: 600 }}><Award size={16} /> BRSA Certification Awarded!</div>}
+          <div style={{ color: 'var(--slate)', fontSize: '0.875rem' }}>Score: {result.score}% — passing was {result.passing}%</div>
         </div>
       </div>
     );
@@ -110,7 +124,7 @@ function ResultBanner({ result, passingScore }: { result: AttemptResult; passing
       <div className="score-ring failed">{result.score}%</div>
       <div>
         <div style={{ color: '#e05a4a', fontWeight: 600, fontSize: '1.05rem', marginBottom: 4 }}><XCircle size={16} style={{ display: 'inline', marginRight: 6 }} />Passing score not met</div>
-        <div style={{ color: 'var(--slate)', fontSize: '0.875rem' }}>You scored {result.score}% — passing is {passingScore}%. Review the material and try again.</div>
+        <div style={{ color: 'var(--slate)', fontSize: '0.875rem' }}>You scored {result.score}% — need {result.passing}% to pass. Review and try again.</div>
       </div>
     </div>
   );
@@ -121,6 +135,7 @@ export default function ModulePage() {
   const moduleId = params?.moduleId as string;
   const { evaluator: authEvaluator, isLoading: authLoading } = useAuth();
   const router = useRouter();
+
   const [module, setModule] = useState<TrainingModule | null>(null);
   const [moduleProgress, setModuleProgress] = useState<ModuleProgress | null>(null);
   const [allModules, setAllModules] = useState<TrainingModule[]>([]);
@@ -133,11 +148,14 @@ export default function ModulePage() {
   const loadData = useCallback(async () => {
     if (!authEvaluator) return;
     try {
-      const [modules, progressData] = await Promise.all([api.getModules(), api.getProgress(authEvaluator.evaluator_id)]);
+      const [modules, progressData] = await Promise.all([
+        api.getModules(),
+        api.getProgress(authEvaluator.evaluator_id),
+      ]);
       setAllModules(modules);
-      setAllProgress(progressData.modules);
+      setAllProgress(progressData.progress || []);
       setModule(modules.find(m => m.module_id === moduleId) || null);
-      setModuleProgress(progressData.modules.find(m => m.module_id === moduleId) || null);
+      setModuleProgress((progressData.progress || []).find((m: ModuleProgress) => m.module_id === moduleId) || null);
     } catch (err: unknown) {
       setToast({ msg: err instanceof Error ? err.message : 'Failed to load module', type: 'error' });
     } finally {
@@ -158,7 +176,7 @@ export default function ModulePage() {
       const res = await api.submitAttempt(authEvaluator.evaluator_id, module.module_id, score);
       setResult(res);
       if (res.passed) {
-        setToast({ msg: res.certified ? '🎉 You are now a certified BRSA Evaluator!' : res.message, type: 'success' });
+        setToast({ msg: 'Module passed! Next module unlocked.', type: 'success' });
         await loadData();
       }
     } catch (err: unknown) {
@@ -168,13 +186,27 @@ export default function ModulePage() {
     }
   };
 
-  const nextModule = allModules.sort((a, b) => a.seq - b.seq).find(m => {
-    const p = allProgress.find(p => p.module_id === m.module_id);
-    return p && (p.status === 'available' || p.status === 'failed') && m.module_id !== moduleId;
-  });
+  const nextModule = allModules
+    .sort((a, b) => a.seq - b.seq)
+    .find(m => {
+      const p = allProgress.find(p => p.module_id === m.module_id);
+      return p && (p.status === 'unlocked' || p.status === 'failed') && m.module_id !== moduleId;
+    });
 
-  if (authLoading || loading) return <><Nav /><div className="page-loader"><div className="spinner" style={{ width: 36, height: 36 }} /></div></>;
-  if (!module || !moduleProgress) return <><Nav /><div className="container" style={{ paddingTop: 60, textAlign: 'center' }}><p style={{ color: 'var(--slate)' }}>Module not found.</p><button className="btn btn-ghost" style={{ marginTop: 16 }} onClick={() => router.push('/dashboard')}>Back to Dashboard</button></div></>;
+  if (authLoading || loading) {
+    return <><Nav /><div className="page-loader"><div className="spinner" style={{ width: 36, height: 36 }} /></div></>;
+  }
+
+  if (!module || !moduleProgress) {
+    return (
+      <><Nav />
+        <div className="container" style={{ paddingTop: 60, textAlign: 'center' }}>
+          <p style={{ color: 'var(--slate)' }}>Module not found.</p>
+          <button className="btn btn-ghost" style={{ marginTop: 16 }} onClick={() => router.push('/dashboard')}>Back to Dashboard</button>
+        </div>
+      </>
+    );
+  }
 
   const isLocked = moduleProgress.status === 'locked';
   const isPassed = moduleProgress.status === 'passed';
@@ -189,6 +221,7 @@ export default function ModulePage() {
             <button className="btn btn-ghost btn-sm" onClick={() => router.push('/dashboard')}><ArrowLeft size={14} /> Dashboard</button>
           </div>
         </div>
+
         <div className="container" style={{ paddingTop: 40 }}>
           <div style={{ maxWidth: 760 }}>
             <div style={{ marginBottom: 32 }}>
@@ -198,7 +231,7 @@ export default function ModulePage() {
                 {isLocked && <span className="badge badge-locked"><Lock size={10} /> Locked</span>}
                 {isPassed && <span className="badge badge-passed"><CheckCircle size={10} /> Passed</span>}
                 {!isLocked && !isPassed && <span className="badge badge-available"><Play size={10} /> Available</span>}
-                <span style={{ color: 'var(--slate-dim)', fontSize: '0.8rem' }}>Passing score: {module.passing_score}%</span>
+                <span style={{ color: 'var(--slate-dim)', fontSize: '0.8rem' }}>Passing: {module.passing_score}%</span>
                 {moduleProgress.attempts > 0 && <span style={{ color: 'var(--slate-dim)', fontSize: '0.8rem' }}>· {moduleProgress.attempts} attempt{moduleProgress.attempts !== 1 ? 's' : ''}</span>}
               </div>
             </div>
@@ -216,18 +249,19 @@ export default function ModulePage() {
                 {module.video_url && (
                   <div style={{ marginBottom: 32 }}>
                     <div style={{ background: '#000', borderRadius: 'var(--radius-lg)', overflow: 'hidden', aspectRatio: '16/9', border: '1px solid var(--navy-light)' }}>
-                      <iframe src={module.video_url} style={{ width: '100%', height: '100%', border: 'none' }} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title={module.title} />
+                      <iframe src={module.video_url} style={{ width: '100%', height: '100%', border: 'none' }} allowFullScreen title={module.title} />
                     </div>
                   </div>
                 )}
+
                 <div className="card" style={{ marginBottom: 32 }}>
                   <h3 style={{ marginBottom: 12 }}>About This Module</h3>
                   <p style={{ fontSize: '0.95rem', lineHeight: 1.7 }}>{module.description}</p>
-                  {moduleProgress.best_score !== null && (
+                  {moduleProgress.score !== null && moduleProgress.score !== undefined && (
                     <>
                       <hr className="divider" />
                       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <div className={`score-ring ${isPassed ? 'passed' : 'failed'}`} style={{ width: 64, height: 64, fontSize: '1.1rem' }}>{moduleProgress.best_score}%</div>
+                        <div className={`score-ring ${isPassed ? 'passed' : 'failed'}`} style={{ width: 64, height: 64, fontSize: '1.1rem' }}>{moduleProgress.score}%</div>
                         <div>
                           <div style={{ color: 'var(--white)', fontWeight: 500, marginBottom: 4 }}>Your best score</div>
                           <div style={{ color: 'var(--slate)', fontSize: '0.85rem' }}>{isPassed ? 'You have passed this module.' : `Need ${module.passing_score}% to pass.`}</div>
@@ -236,10 +270,13 @@ export default function ModulePage() {
                     </>
                   )}
                 </div>
-                {result && <div style={{ marginBottom: 32 }}><ResultBanner result={result} passingScore={module.passing_score} /></div>}
+
+                {result && <div style={{ marginBottom: 32 }}><ResultBanner result={result} /></div>}
+
                 <div className="card" style={{ marginBottom: 32 }}>
-                  <QuizSection module={module} onSubmit={handleSubmit} submitting={submitting} result={result} disabled={false} />
+                  <QuizSection module={module} onSubmit={handleSubmit} submitting={submitting} result={result} />
                 </div>
+
                 {result?.passed && nextModule && (
                   <div style={{ background: 'rgba(200,168,75,.06)', border: '1px solid rgba(200,168,75,.25)', borderRadius: 'var(--radius-lg)', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
                     <div>
@@ -249,8 +286,11 @@ export default function ModulePage() {
                     <button className="btn btn-primary btn-sm" onClick={() => router.push(`/module/${nextModule.module_id}`)}>Continue <ChevronRight size={14} /></button>
                   </div>
                 )}
-                {result?.certified && (
-                  <button className="btn btn-primary" onClick={() => router.push('/dashboard')} style={{ width: '100%' }}><Award size={16} /> View My Certification</button>
+
+                {result?.passed && !nextModule && (
+                  <button className="btn btn-primary" onClick={() => router.push('/dashboard')} style={{ width: '100%' }}>
+                    <Award size={16} /> Back to Dashboard
+                  </button>
                 )}
               </>
             )}
@@ -259,4 +299,4 @@ export default function ModulePage() {
       </main>
     </>
   );
-      }
+            }
