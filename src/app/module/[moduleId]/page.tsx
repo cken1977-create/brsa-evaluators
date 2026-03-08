@@ -10,17 +10,34 @@ import { ArrowLeft, CheckCircle, XCircle, Award, Lock, Play, RefreshCw, ChevronR
 
 const QUIZ_TEMPLATES = [
   {
+    // Module 1 — Behavioral Observation Fundamentals
     questions: [
-      { q: 'What is the primary purpose of BRSA evaluation standards?', options: ['To rank evaluators by performance', 'To establish consistent behavioral readiness criteria', 'To reduce evaluation time', 'To certify organizations only'], correct: 1 },
-      { q: 'Which best describes "behavioral readiness"?', options: ['Physical fitness', 'Cognitive and procedural preparedness for defined roles', 'Documentation compliance only', 'Training hours completed'], correct: 1 },
-      { q: 'An evaluator\'s primary responsibility is to:', options: ['Pass as many participants as possible', 'Apply objective standardized criteria without bias', 'Defer all decisions to supervisors', 'Focus exclusively on written assessments'], correct: 1 },
+      { q: 'What is the primary role of a BRSA Evaluator?', options: ['Interpret participant behavior and assign meaning', 'Observe behavior and record it exactly as it occurs', 'Score participants based on personal judgment', 'Determine readiness outcomes independently'], correct: 1 },
+      { q: 'Which statement best reflects BRSA evaluation doctrine?', options: ['Behavior is recorded as meaning, not action', 'Evaluators may interpret behavior when necessary', 'Behavior is recorded as action, not meaning', 'Interpretation improves evaluation accuracy'], correct: 2 },
+      { q: 'An evaluator notices a participant pause before responding. What should they record?', options: ['Subject appeared nervous', 'Subject was unprepared', 'Subject paused for four seconds before responding', 'Subject demonstrated anxiety'], correct: 2 },
+      { q: 'What is Protocol Reference BRSA-EV-PR-001 concerned with?', options: ['Scoring criteria', 'Submission procedures', 'Observation techniques', 'Preparation before beginning an evaluation'], correct: 3 },
+      { q: 'Which action violates BRSA documentation standards?', options: ['Recording observable actions', 'Recording timing of responses', 'Recording assumed emotions', 'Recording observable responses'], correct: 2 },
+      { q: 'Why does BRSA require evaluators to maintain neutrality?', options: ['To reduce evaluation time', 'To ensure consistency, audit integrity, and reliability of the standard', 'To limit the number of evidence events recorded', 'To simplify the scoring process'], correct: 1 },
+      { q: 'What does Protocol Reference BRSA-EV-PR-004 govern?', options: ['Preparation', 'Documentation', 'Scoring', 'Submission'], correct: 2 },
+      { q: 'An evaluator adjusts a score based on personal sympathy. This violates which protocol?', options: ['BRSA-EV-PR-001', 'BRSA-EV-PR-002', 'BRSA-EV-PR-003', 'BRSA-EV-PR-004'], correct: 3 },
+      { q: 'What happens when an evaluator submits incomplete records?', options: ['The system auto-completes missing data', 'Audit integrity is preserved regardless', 'The evaluation process is incomplete and audit integrity is compromised', 'A supervisor is automatically notified'], correct: 2 },
+      { q: 'The Evaluator Oath commits evaluators to:', options: ['Pass all participants who show effort', 'Observe without bias, record without interpretation, uphold doctrine with neutrality and precision', 'Prioritize efficiency over documentation accuracy', 'Defer all scoring decisions to senior evaluators'], correct: 1 },
     ],
   },
+  // Modules 2-8 will be added here
   {
+    // Placeholder for modules 2-8 until scripts are finalized
     questions: [
-      { q: 'Evaluator impartiality requires assessments be conducted:', options: ['Based on personal relationships', 'Without prior knowledge of the participant', 'Using consistent criteria regardless of relationship', 'Only with senior oversight present'], correct: 2 },
-      { q: 'Which practice BEST supports evaluator impartiality?', options: ['Sharing preliminary scores with colleagues', 'Documenting all observations contemporaneously', 'Adjusting criteria based on context', 'Conducting assessments in pairs only'], correct: 1 },
-      { q: 'When an evaluator has a conflict of interest, they should:', options: ['Proceed but document the conflict', 'Recuse themselves and notify their coordinator', 'Have a colleague observe', 'Score more strictly to compensate'], correct: 1 },
+      { q: 'What is the primary role of a BRSA Evaluator?', options: ['Interpret participant behavior and assign meaning', 'Observe behavior and record it exactly as it occurs', 'Score participants based on personal judgment', 'Determine readiness outcomes independently'], correct: 1 },
+      { q: 'Which statement best reflects BRSA evaluation doctrine?', options: ['Behavior is recorded as meaning, not action', 'Evaluators may interpret behavior when necessary', 'Behavior is recorded as action, not meaning', 'Interpretation improves evaluation accuracy'], correct: 2 },
+      { q: 'An evaluator notices a participant pause before responding. What should they record?', options: ['Subject appeared nervous', 'Subject was unprepared', 'Subject paused for four seconds before responding', 'Subject demonstrated anxiety'], correct: 2 },
+      { q: 'What is Protocol Reference BRSA-EV-PR-001 concerned with?', options: ['Scoring criteria', 'Submission procedures', 'Observation techniques', 'Preparation before beginning an evaluation'], correct: 3 },
+      { q: 'Which action violates BRSA documentation standards?', options: ['Recording observable actions', 'Recording timing of responses', 'Recording assumed emotions', 'Recording observable responses'], correct: 2 },
+      { q: 'Why does BRSA require evaluators to maintain neutrality?', options: ['To reduce evaluation time', 'To ensure consistency, audit integrity, and reliability of the standard', 'To limit the number of evidence events recorded', 'To simplify the scoring process'], correct: 1 },
+      { q: 'What does Protocol Reference BRSA-EV-PR-004 govern?', options: ['Preparation', 'Documentation', 'Scoring', 'Submission'], correct: 2 },
+      { q: 'An evaluator adjusts a score based on personal sympathy. This violates which protocol?', options: ['BRSA-EV-PR-001', 'BRSA-EV-PR-002', 'BRSA-EV-PR-003', 'BRSA-EV-PR-004'], correct: 3 },
+      { q: 'What happens when an evaluator submits incomplete records?', options: ['The system auto-completes missing data', 'Audit integrity is preserved regardless', 'The evaluation process is incomplete and audit integrity is compromised', 'A supervisor is automatically notified'], correct: 2 },
+      { q: 'The Evaluator Oath commits evaluators to:', options: ['Pass all participants who show effort', 'Observe without bias, record without interpretation, uphold doctrine with neutrality and precision', 'Prioritize efficiency over documentation accuracy', 'Defer all scoring decisions to senior evaluators'], correct: 1 },
     ],
   },
 ];
