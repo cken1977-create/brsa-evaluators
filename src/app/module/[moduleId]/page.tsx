@@ -120,7 +120,16 @@ const QUIZ_TEMPLATES = [
       { q: 'What is the core doctrine of evaluator authority in BRSA?', options: ['Evaluator authority expands with experience', 'Evaluator authority is bounded by protocol and ethics', 'Senior evaluators have unlimited authority', 'Authority is granted by the organization not BRSA'], correct: 1 },
       { q: 'An evaluator is assigned to evaluate a participant they know personally. The correct action is:', options: ['Proceed but document the relationship', 'Ask a colleague to observe the evaluation', 'Disclose the relationship and recuse from the evaluation', 'Score more strictly to compensate for bias'], correct: 2 },
       { q: 'Why must evaluators disclose conflicts of interest?', options: ['To reduce evaluation caseload', 'Conflicts of interest compromise evaluation neutrality', 'To notify the participant in advance', 'To request reassignment to a different program'], correct: 1 },
-      { q: 'Participant information may be shared:', options: ['With colleagues for training purposes', 'With partner organizations upon reques
+      { q: 'Participant information may be shared:', options: ['With colleagues for training purposes', 'With partner organizations upon request', 'Only through authorized channels', 'When the participant gives verbal permission'], correct: 2 },
+      { q: 'What does maintaining evaluator certification require?', options: ['Completing one evaluation per month', 'Consistent adherence to process, accurate documentation, disciplined language, and willingness to pause', 'Annual recertification exam only', 'Supervisor approval for each evaluation session'], correct: 1 },
+      { q: 'Under what circumstances can BRSA certification be reviewed, paused, or revoked?', options: ['Only after a formal complaint is filed', 'Never once granted', 'If discipline and protocol adherence slips', 'Only at annual review intervals'], correct: 2 },
+      { q: 'An evaluator discovers they made a documentation error. The correct action is:', options: ['Correct it quietly without reporting', 'Document the error and report through protocol', 'Delete and resubmit without notation', 'Ask a colleague to correct it on their behalf'], correct: 1 },
+      { q: 'What does the BRSA principle of accountability without blame mean?', options: ['Errors are ignored to protect evaluator morale', 'Errors are documented, reviewed, and used to correct the system without assigning personal blame', 'Only participants are held accountable for evaluation outcomes', 'Blame is assigned only to senior evaluators'], correct: 1 },
+      { q: 'What remains constant even as people, systems, and rules evolve within BRSA?', options: ['Scoring criteria', 'Evaluator tier structure', 'Integrity', 'Domain definitions'], correct: 2 },
+      { q: 'The Final Evaluator Certification Oath commits evaluators to:', options: ['Achieve senior evaluator status within one year', 'Operate within authorized boundaries, protect participant confidentiality, report violations without concealment, and maintain certification through continuous discipline', 'Complete all 8 modules annually for recertification', 'Submit evaluation reports to BRSA Holdings monthly'], correct: 1 },
+    ],
+  },
+];
   
 
 function getQuiz(seq: number) {
