@@ -10,6 +10,7 @@ import Toast from '@/components/Toast';
 export default function RegisterPage() {
   const { login, evaluator } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [form, setForm] = useState({ name: '', email: '', organization: '' });
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
