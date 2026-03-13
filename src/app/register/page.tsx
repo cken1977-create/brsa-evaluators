@@ -19,6 +19,13 @@ export default function RegisterPage() {
     if (evaluator) router.replace('/dashboard');
   }, [evaluator, router]);
 
+  useEffect(() => {
+  const org = searchParams.get('org');
+  if (org) {
+    setForm(f => ({ ...f, organization: org }));
+  }
+}, [searchParams]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }));
   };
