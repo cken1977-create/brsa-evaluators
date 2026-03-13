@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { api } from '@/lib/api';
 import Link from 'next/link';
@@ -10,7 +10,7 @@ import Toast from '@/components/Toast';
 export default function RegisterPage() {
   const { login, evaluator } = useAuth();
   const router = useRouter();
-  const [form, setForm] = useState({ name: '', email: '', organization: 'vizionz_sankofa' '' });
+  const [form, setForm] = useState({ name: '', email: '', organization: '' });
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
