@@ -28,6 +28,7 @@ export interface Evaluator {
   certified: boolean;
   certified_at: string | null;
   created_at: string;
+  organization: string;
 }
 
 export interface EvaluatorProgress {
