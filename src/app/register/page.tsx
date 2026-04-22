@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { api } from '@/lib/api';
 import Link from 'next/link';
 import Toast from '@/components/Toast';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const { login, evaluator } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -20,11 +20,11 @@ export default function RegisterPage() {
   }, [evaluator, router]);
 
   useEffect(() => {
-  const org = searchParams.get('org');
-  if (org) {
-    setForm(f => ({ ...f, organization: org }));
-  }
-}, [searchParams]);
+    const org = searchParams.get('org');
+    if (org) {
+      setForm(f => ({ ...f, organization: org }));
+    }
+  }, [searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }));
@@ -36,15 +36,15 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const newEvaluator = await api.createEvaluator({
-  full_name: form.name.trim(),
-  email: form.email.trim().toLowerCase(),
+        full_name: form.name.trim(),
+        email: form.email.trim().toLowerCase(),
         organization: form.organization.trim().toLowerCase()
-});
+      });
       const stored = localStorage.getItem('brsa_known_evaluators');
       const known: Record<string, string> = stored ? JSON.parse(stored) : {};
       known[form.email.trim().toLowerCase()] = newEvaluator.evaluator_id;
-known[form.email.trim().toLowerCase() + '_name'] = form.name.trim();
-localStorage.setItem('brsa_known_evaluators', JSON.stringify(known));
+      known[form.email.trim().toLowerCase() + '_name'] = form.name.trim();
+      localStorage.setItem('brsa_known_evaluators', JSON.stringify(known));
       login(newEvaluator);
       setToast({ msg: 'Account created! Welcome to the BRSA Training Portal.', type: 'success' });
       setTimeout(() => router.push('/dashboard'), 1200);
@@ -107,4 +107,12 @@ localStorage.setItem('brsa_known_evaluators', JSON.stringify(known));
       </div>
     </>
   );
-      }
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterForm />
+    </Suspense>
+  );
+}
