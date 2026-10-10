@@ -72,8 +72,8 @@ export default function DashboardPage() {
       const data = await api.getProgress(authEvaluator.evaluator_id);
       setModules(data.progress || []);
       // check if all modules passed
-      const allPassed = (data.progress || []).length > 0 && (data.progress || []).every(m => m.status === 'passed');
-      setCertified(allPassed);
+      // Certification is recorded server-side (credential id + date).
+      setCertified(!!authEvaluator.certified);
     } catch (err: unknown) {
       setToast({ msg: err instanceof Error ? err.message : 'Failed to load progress', type: 'error' });
     } finally {
@@ -148,8 +148,14 @@ export default function DashboardPage() {
                 </p>
                 <div style={{ marginTop: 20 }}>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--slate)', letterSpacing: '.1em' }}>
-                    CERT ID: BRSA-{authEvaluator?.evaluator_id?.slice(5, 13).toUpperCase()}
+                    CREDENTIAL ID: {authEvaluator?.credential_id || 'pending'}
+                    {authEvaluator?.certified_at ? ` · ${new Date(authEvaluator.certified_at).toLocaleDateString()}` : ''}
                   </span>
+                </div>
+                <p style={{ marginTop: 14, fontSize: '0.82rem', color: 'var(--slate)' }}>
+                  Evaluator workspace access is granted separately by a BRSA administrator.
+                </p>
+                <div>
                 </div>
               </div>
             </div>

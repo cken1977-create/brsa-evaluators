@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
-import { api } from '@/lib/api';
+import { api, ApiError } from '@/lib/api';
 import Link from 'next/link';
 import Toast from '@/components/Toast';
 
@@ -11,7 +11,9 @@ export default function LoginPage() {
   const { login, evaluator } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [linkSent, setLinkSent] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: 'error' | 'info' } | null>(null);
 
   useEffect(() => {
@@ -20,14 +22,37 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    if (!email.trim() || !password) return;
     setLoading(true);
     try {
-      const evaluatorData = await api.lookupByEmail(email.trim().toLowerCase());
-      login(evaluatorData);
+      const session = await api.login(email.trim().toLowerCase(), password);
+      login(session);
       router.push('/dashboard');
+    } catch (err: unknown) {
+      const code = err instanceof ApiError ? err.code : undefined;
+      if (code === 'use_magic_link') {
+        setToast({ msg: 'Your account was created before passwords. Use “Email me a sign-in link” below, then set a password.', type: 'info' });
+      } else if (err instanceof ApiError && err.status === 429) {
+        setToast({ msg: 'Too many sign-in attempts. Please wait a few minutes.', type: 'error' });
+      } else {
+        setToast({ msg: 'Invalid email or password.', type: 'error' });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMagicLink = async () => {
+    if (!email.trim()) {
+      setToast({ msg: 'Enter your email address first.', type: 'info' });
+      return;
+    }
+    setLoading(true);
+    try {
+      await api.requestMagicLink(email.trim().toLowerCase());
+      setLinkSent(true);
     } catch {
-      setToast({ msg: 'No account found for that email. Please register first.', type: 'error' });
+      setToast({ msg: 'Could not send a link right now. Please try again shortly.', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -55,8 +80,9 @@ export default function LoginPage() {
             <div className="card">
               <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <div className="form-group">
-                  <label className="form-label">Email Address</label>
+                  <label className="form-label" htmlFor="email">Email Address</label>
                   <input
+                    id="email"
                     className="form-input"
                     type="email"
                     placeholder="you@organization.org"
@@ -64,6 +90,18 @@ export default function LoginPage() {
                     onChange={e => setEmail(e.target.value)}
                     required
                     autoFocus
+                    autoComplete="email"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="password">Password</label>
+                  <input
+                    id="password"
+                    className="form-input"
+                    type="password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    autoComplete="current-password"
                   />
                 </div>
                 <button className="btn btn-primary btn-full" type="submit" disabled={loading}>
@@ -71,6 +109,15 @@ export default function LoginPage() {
                 </button>
               </form>
               <div className="gold-rule"><span>or</span></div>
+              {linkSent ? (
+                <p role="status" style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--success-light)', marginBottom: 16 }}>
+                  If an evaluator account exists for that email, a sign-in link is on its way. It works once and expires in 20 minutes.
+                </p>
+              ) : (
+                <button className="btn btn-ghost btn-full" type="button" onClick={handleMagicLink} disabled={loading} style={{ marginBottom: 16 }}>
+                  Email me a sign-in link
+                </button>
+              )}
               <p style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--slate)' }}>
                 New evaluator? <Link href="/register" style={{ fontWeight: 500 }}>Create an account</Link>
               </p>
