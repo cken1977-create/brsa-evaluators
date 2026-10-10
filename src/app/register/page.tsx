@@ -11,7 +11,7 @@ function RegisterForm() {
   const { login, evaluator } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [form, setForm] = useState({ name: '', email: '', organization: '' });
+  const [form, setForm] = useState({ name: '', email: '', organization: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
@@ -35,17 +35,17 @@ function RegisterForm() {
     if (!form.name.trim() || !form.email.trim()) return;
     setLoading(true);
     try {
-      const newEvaluator = await api.createEvaluator({
+      if (form.password.length < 10) {
+        setToast({ msg: 'Password must be at least 10 characters.', type: 'error' });
+        return;
+      }
+      const session = await api.register({
         full_name: form.name.trim(),
         email: form.email.trim().toLowerCase(),
-        organization: form.organization.trim().toLowerCase()
+        organization: form.organization.trim().toLowerCase(),
+        password: form.password,
       });
-      const stored = localStorage.getItem('brsa_known_evaluators');
-      const known: Record<string, string> = stored ? JSON.parse(stored) : {};
-      known[form.email.trim().toLowerCase()] = newEvaluator.evaluator_id;
-      known[form.email.trim().toLowerCase() + '_name'] = form.name.trim();
-      localStorage.setItem('brsa_known_evaluators', JSON.stringify(known));
-      login(newEvaluator);
+      login(session);
       setToast({ msg: 'Account created! Welcome to the BRSA Training Portal.', type: 'success' });
       setTimeout(() => router.push('/dashboard'), 1200);
     } catch (err: unknown) {
@@ -87,6 +87,10 @@ function RegisterForm() {
                 <div className="form-group">
                   <label className="form-label">Organization</label>
                   <input className="form-input" name="organization" placeholder="Your institution or organization" value={form.organization} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="password">Password (10+ characters)</label>
+                  <input id="password" className="form-input" name="password" type="password" autoComplete="new-password" minLength={10} value={form.password} onChange={handleChange} required />
                 </div>
                 <div style={{ background: 'var(--navy)', border: '1px solid var(--navy-light)', borderRadius: 'var(--radius)', padding: '14px 16px' }}>
                   <p style={{ fontSize: '0.82rem', color: 'var(--slate)', lineHeight: 1.6 }}>
